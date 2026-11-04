@@ -61,32 +61,8 @@ input:focus,button:focus-visible{outline:2px solid var(--y);border-color:var(--y
     <input type="search" id="pSearch" placeholder="Cerca il tuo nome…" style="margin-top:10px" aria-label="Cerca il tuo nome">
     <div class="list" id="pList"></div>
     <p class="note" id="pUpd" style="margin-top:10px"></p>
-    <p class="note" style="margin-top:6px">Non trovi il tuo nome? <a href="#" id="toManual" style="color:var(--y)">Inserisci i punti a mano</a></p>
   </section>
 
-  <form id="form" class="card hidden" autocomplete="off">
-    <p class="note" style="margin-bottom:4px"><a href="#" id="toPick" style="color:var(--y)">← Torna alla ricerca</a></p>
-    <label class="l" for="fName">Nome</label>
-    <input type="text" id="fName" maxlength="32" placeholder="Es. Giulia Bianchi">
-    <label class="l">Division</label>
-    <div class="seg" id="fSex"><button type="button" data-v="U">MEN</button><button type="button" data-v="D">WOMEN</button></div>
-    <label class="l">Punti per AMRAP (dal tabellone)</label>
-    <div class="am">
-      <div><label for="a1">AMRAP 1</label><input type="number" inputmode="decimal" step="any" min="0" id="a1"></div>
-      <div><label for="a2">AMRAP 2</label><input type="number" inputmode="decimal" step="any" min="0" id="a2"></div>
-      <div><label for="a3">AMRAP 3</label><input type="number" inputmode="decimal" step="any" min="0" id="a3"></div>
-      <div><label for="a4">AMRAP 4</label><input type="number" inputmode="decimal" step="any" min="0" id="a4"></div>
-      <div><label for="a5">AMRAP 5</label><input type="number" inputmode="decimal" step="any" min="0" id="a5"></div>
-    </div>
-    <div class="tot"><span>Totale</span><b id="tot">–</b></div>
-    <p class="note">Non hai i punti di ogni AMRAP? Scrivi solo il totale qui sotto.</p>
-    <div class="row2">
-      <div><label class="l" for="fTot">Punti totali</label><input type="number" inputmode="decimal" step="any" min="0" id="fTot"></div>
-      <div><label class="l" for="fPos">Posizione (facoltativa)</label><input type="number" inputmode="numeric" min="1" id="fPos"></div>
-    </div>
-    <button class="btn" type="submit">Crea la grafica</button>
-    <div class="msg" id="msg"></div>
-  </form>
 
   <div id="out" class="hidden">
     <img id="outImg" alt="La tua grafica Challenge HYROX">
@@ -125,25 +101,6 @@ function renderPick(){
   $("#pUpd").textContent = R.updated ? "Risultati aggiornati al "+R.updated : "";
 }
 renderPick();
-$("#toManual").onclick=e=>{ e.preventDefault(); $("#pick").classList.add("hidden"); $("#form").classList.remove("hidden"); };
-$("#toPick").onclick=e=>{ e.preventDefault(); $("#form").classList.add("hidden"); $("#pick").classList.remove("hidden"); };
-let sex=null;
-$$("#fSex button").forEach(b=>b.onclick=()=>{ sex=b.dataset.v; $$("#fSex button").forEach(x=>x.classList.toggle("on",x===b)); });
-function per(){ return [1,2,3,4,5].map(i=>num($("#a"+i).value)); }
-function upd(){ const p=per(); const ok=p.filter(v=>v!=null&&!Number.isNaN(v)); $("#tot").textContent= ok.length? fmtPts(ok.reduce((s,v)=>s+v,0)) : "–"; }
-$$(".am input").forEach(i=>i.addEventListener("input",upd));
-$("#form").addEventListener("submit",e=>{
-  e.preventDefault(); const m=$("#msg"); m.textContent="";
-  const name=$("#fName").value.trim().replace(/\s+/g," ");
-  if(!name) return m.textContent="Scrivi il tuo nome.";
-  if(!sex) return m.textContent="Scegli la division: MEN o WOMEN.";
-  const p=per(); if(p.some(Number.isNaN)) return m.textContent="I punti devono essere numeri positivi.";
-  const filled=p.filter(v=>v!=null);
-  let total = filled.length ? filled.reduce((s,v)=>s+v,0) : num($("#fTot").value);
-  if(total==null||Number.isNaN(total)) return m.textContent="Inserisci i punti degli AMRAP o il totale.";
-  const pos=num($("#fPos").value); if(Number.isNaN(pos)) return m.textContent="Posizione non valida.";
-  makeGraphic({name,sex,total,per:filled.length?p:null,pos:pos?Math.round(pos):null});
-});
 $("#back").onclick=()=>{ $("#out").classList.add("hidden"); $("#pick").classList.remove("hidden"); };
 const lgH=new Image(); lgH.src=LOGO_W; const lgP=new Image(); lgP.src=LOGO_P;
 function today(){ const d=new Date(); return String(d.getDate()).padStart(2,"0")+"."+String(d.getMonth()+1).padStart(2,"0")+"."+d.getFullYear(); }
@@ -191,7 +148,7 @@ async function makeGraphic(a){
   x.font='500 22px Barlow,sans-serif'; x.fillStyle="#8A9099"; x.letterSpacing="1px";
   x.fillText("Evento del club, non è una gara ufficiale HYROX", W/2, H-36);
   $("#outImg").src=c.toDataURL("image/jpeg",0.9);
-  $("#form").classList.add("hidden"); $("#pick").classList.add("hidden"); $("#out").classList.remove("hidden"); scrollTo({top:0});
+  $("#pick").classList.add("hidden"); $("#out").classList.remove("hidden"); scrollTo({top:0});
 }
 </script>
 </body>
