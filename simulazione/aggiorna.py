@@ -33,6 +33,14 @@ blob = json.dumps(res, ensure_ascii=False).replace("</", "<\\/")
 
 p = pathlib.Path(__file__).with_name("index.html")
 html = p.read_text(encoding="utf-8")
+m = re.search(r'<script id="results" type="application/json">(.*?)</script>', html, flags=re.S)
+try:
+    prev = json.loads(m.group(1)) if m else {}
+except Exception:
+    prev = {}
+if prev.get("athletes") == out and (prev.get("event") or {}).get("date") == date:
+    print(f"nessuna modifica ({len(out)} atleti)")
+    sys.exit(0)
 new, k = re.subn(r'(<script id="results" type="application/json">).*?(</script>)',
                  lambda m: m.group(1) + blob + m.group(2), html, count=1, flags=re.S)
 if k != 1:
